@@ -1,0 +1,30 @@
+Spatial panel fixed effects sarar model
+ 
+
+Call:
+spml(formula = Occupied ~ initial_shock + rest_pandemic + lockdown_days_per_1st + 
+    lockdown_days_per_REST, data = emp_data, index = c("region", 
+    "date"), listw = w, model = "within", effect = "individual", 
+    lag = TRUE, spatial.error = "b")
+
+Residuals:
+     Min.   1st Qu.    Median   3rd Qu.      Max. 
+-3.872327 -0.617315  0.054224  0.647945  3.966931 
+
+Spatial error parameter:
+     Estimate Std. Error t-value Pr(>|t|)
+rho -0.093777   0.130005 -0.7213   0.4707
+
+Spatial autoregressive coefficient:
+       Estimate Std. Error t-value Pr(>|t|)
+lambda  0.15008    0.11631  1.2904   0.1969
+
+Coefficients:
+                         Estimate Std. Error t-value  Pr(>|t|)    
+initial_shock          -3.6032881  0.4124382 -8.7366 < 2.2e-16 ***
+rest_pandemic           0.3760461  0.1885860  1.9940  0.046149 *  
+lockdown_days_per_1st   0.0053760  0.0122193  0.4400  0.659966    
+lockdown_days_per_REST  0.0128661  0.0038691  3.3254  0.000883 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+

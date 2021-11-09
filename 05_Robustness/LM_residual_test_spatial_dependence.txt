@@ -1,0 +1,14 @@
+
+	Locally robust LM test for spatial error dependence sub spatial lag
+
+data:  formula (within transformation)
+LM = 0.044145, df = 1, p-value = 0.8336
+alternative hypothesis: spatial error dependence
+
+
+	Locally robust LM test for spatial lag dependence sub spatial error
+
+data:  formula (within transformation)
+LM = 0.1021, df = 1, p-value = 0.7493
+alternative hypothesis: spatial lag dependence
+

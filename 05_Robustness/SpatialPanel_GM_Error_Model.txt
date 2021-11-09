@@ -1,0 +1,38 @@
+Spatial panel fixed effects GM model
+ 
+
+Call:
+spgm(formula = Occupied ~ initial_shock + rest_pandemic + lockdown_days_per_1st + 
+    lockdown_days_per_REST + mes_central, data = emp_data[complete.cases(Occupied) == 
+    T, ], index = c("region", "date"), listw = w, lag = FALSE, 
+    spatial.error = TRUE, moments = "fullweights", method = "w2sls")
+
+Residuals:
+      Min.    1st Qu.     Median    3rd Qu.       Max. 
+-3.8014250 -0.6234338  0.0030974  0.6495934  4.3299176 
+
+Estimated spatial coefficient, variance components and theta:
+          Estimate
+rho       0.062017
+sigma^2_v 1.131480
+
+Coefficients:
+                         Estimate Std. Error  t-value  Pr(>|t|)    
+initial_shock          -3.9125647  0.2433938 -16.0750 < 2.2e-16 ***
+rest_pandemic           0.4452996  0.2308226   1.9292  0.053708 .  
+lockdown_days_per_1st   0.0050778  0.0126071   0.4028  0.687113    
+lockdown_days_per_REST  0.0122874  0.0038783   3.1683  0.001533 ** 
+mes_central2           -0.8415816  0.3447878  -2.4409  0.014652 *  
+mes_central3           -0.6985239  0.3460989  -2.0183  0.043562 *  
+mes_central4            0.9353459  0.3442221   2.7173  0.006582 ** 
+mes_central5            0.0897092  0.3074637   0.2918  0.770461    
+mes_central6           -0.3906513  0.3407279  -1.1465  0.251580    
+mes_central7           -0.2523310  0.3437151  -0.7341  0.462871    
+mes_central8            0.5307459  0.3429948   1.5474  0.121770    
+mes_central9            0.7232214  0.3290176   2.1981  0.027940 *  
+mes_central10                  NA         NA       NA        NA    
+mes_central11                  NA         NA       NA        NA    
+mes_central12                  NA         NA       NA        NA    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+

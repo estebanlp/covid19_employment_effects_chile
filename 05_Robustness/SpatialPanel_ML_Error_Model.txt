@@ -1,0 +1,26 @@
+Spatial panel fixed effects error model
+ 
+
+Call:
+spml(formula = Occupied ~ initial_shock + rest_pandemic + lockdown_days_per_1st + 
+    lockdown_days_per_REST, data = emp_data[complete.cases(Occupied) == 
+    T, ], index = c("region", "date"), listw = w, model = "within", 
+    effect = "individual", spatial.error = "b")
+
+Residuals:
+     Min.   1st Qu.    Median   3rd Qu.      Max. 
+-3.943530 -0.577194  0.029466  0.599565  4.067959 
+
+Spatial error parameter:
+    Estimate Std. Error t-value Pr(>|t|)
+rho 0.050214   0.054448  0.9222   0.3564
+
+Coefficients:
+                         Estimate Std. Error  t-value  Pr(>|t|)    
+initial_shock          -4.0424011  0.2104734 -19.2062 < 2.2e-16 ***
+rest_pandemic           0.3966018  0.2052744   1.9321 0.0533526 .  
+lockdown_days_per_1st   0.0064556  0.0127615   0.5059 0.6129513    
+lockdown_days_per_REST  0.0137210  0.0039124   3.5071 0.0004531 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+

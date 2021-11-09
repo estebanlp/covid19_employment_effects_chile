@@ -1,0 +1,28 @@
+
+Call:spgm(formula = Occupied ~ initial_shock + rest_pandemic + lockdown_days_per_1st + 
+    lockdown_days_per_REST + mes_central, data = emp_data[complete.cases(Occupied) == 
+    T, ], index = c("region", "date"), listw = w, lag = TRUE, 
+    spatial.error = FALSE, moments = "fullweights", method = "w2sls")
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-3.777174 -0.637770  0.011392  0.643874  4.275681 
+
+Coefficients: 
+                         Estimate Std. Error t value Pr(>|t|)
+lambda                  0.0539627  0.1149261  0.4695 0.638682
+initial_shock          -3.7812166  0.4626781 -8.1725 2.22e-16
+rest_pandemic           0.4497711  0.2373101  1.8953 0.058054
+lockdown_days_per_1st   0.0047937  0.0129642  0.3698 0.711557
+lockdown_days_per_REST  0.0121822  0.0041073  2.9660 0.003017
+mes_central2           -0.8548883  0.3583002 -2.3860 0.017035
+mes_central3           -0.6422136  0.3579658 -1.7941 0.072803
+mes_central4            0.9610784  0.3577782  2.6862 0.007226
+mes_central5            0.0618467  0.3206728  0.1929 0.847064
+mes_central6           -0.3817151  0.3590666 -1.0631 0.287747
+mes_central7           -0.2677564  0.3543095 -0.7557 0.449821
+mes_central8            0.5095388  0.3568608  1.4278 0.153339
+mes_central9            0.6968287  0.3433095  2.0297 0.042383
+
+Residual variance (sigma squared): 1.1201, (sigma: 1.0584)
+

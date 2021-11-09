@@ -1,0 +1,120 @@
+---
+title: 'Reproducible Notebook on: "COVID-19 and employment relief programs: A tale
+  of spatially blind policies for a spatially driven pandemic"'
+author: "Esteban Lopez"
+author: "Juan Eberhard"
+author: "Patricio Aroca"
+date: "4/7/2021"
+output: html_document
+---
+
+## 1. Introduction
+
+This is a reproducible notebook on the paper **"COVID-19 and employment relief programs: A tale of spatially blind policies for a spatially driven pandemic"**, submitted to the Journal of Regional Science.
+
+The paper's main objective is twofold. First we aim to provide new insights about the effects that the pandemic had on the labor market in Chile. Second, we aim to evaluate the effectiveness of the employment relief program "Employment Protection Law" (Ley de Protección del Empleo - LPE in spanish).
+
+Taking advantage of the spatial and temporal variation on employment data, we use the sanitary lockdowns (quarantines) imposed as a way to identify, the impacts of the pandemic, as well as the extent to which employment relief (designed as a nation-wide and spatially blind policy) was able to lessen the effects of the pandemic on regional labor markets in Chile.
+
+The aim of this notebook is to provide access to other researchers and reviewers to look at the whole estimation process in detail. As such this notebook is organized as follows: Section 2 outlines the codes and sources used for data construction. Section 3 provides a set of scripts showing the code used for creating maps and descriptive statistics. Section 4 shows the codes used for estimation on the main models and the tables shown in the paper. Section 5 provides the scripts and codes used for conducting robustness checks on our main estimations.
+
+## 2. Data construction
+
+The unit of analysis in this paper is the region $r$ varying through months $m$. Based on this panel structure, we want to assess how employment (and other labor market variables) have changed as a result of: 1) the start of the pandemic set for March 2020; 2) the imposition of mobility lockdowns; and 3) the adherence to the LPE program.
+
+As such, the final data source used in this paper is a combination of:
+
+-   *Employment data*: A micro-level household survey on employment situation and conditions that is representative at the regional level by the use of sampling weights.
+
+-   *Lockdown data*: Lockdowns are here aggregated at the regional level and month. Lockdowns are determined by the national ministry of health and imposed at the municipal level in a dynamic fashion. Lockdowns started to be imposed since March 2020 and could last several weeks or even months.
+
+-   *Mobility data*: data set containing the average percentage of mobility reduction at the regional level based on mobile phone data.
+
+-   *LPE program*: adherence to the LPE employment relief program takes place at the firm level at any time from April 2020 onward. This data is here aggregated at the regional level by combining this data with official records on firm locations.
+
+The following code chunks show the creation of the three aforementioned parts separately, which are later merged into a single file for the creation of a panel data set of regions through the months from September 2018 through September 2020, containing employment variables, lockdown presence and intensity indexes, and regional LPE program adherence levels.
+
+#### 2.1 Employment data
+
+Employment data comes from the National Institute of Statistics (INE-Chile). The raw data can be downloaded from [here](https://www.ine.cl/estadisticas/sociales/mercado-laboral/ocupacion-y-desocupacion). The script bellow takes care of loading the data month by month, calculating labor market variables at regional level, both in levels and in one-year percentage changes. The end product is a panel data set (object name called `emp_data`) of regions and months spanning from September 2018, to September 2020. This script will create and save the employment data as `employment_panel_data.dta` in the repository folder `01_Data/001_Employment/`
+
+```{r Employment, echo=FALSE}
+library(data.table)
+library(readstata13)
+library(readxl)
+library(readr)
+library(tidyverse)
+
+source("02_Scripts/021_EmploymentDataConstruction.R")
+
+str(emp_data)#shows the structure of the data and all its variables
+```
+
+#### 2.2 Lockdown data
+
+Lockdown data comes from the official repository of the Chilean Ministry of Science. The raw data can be downloaded from [here](https://github.com/MinCiencia/Datos-COVID19/tree/master/output/producto29). The script bellow take the dates in which each quarantine was imposed, and turns it into first into a municipality-by-month panel data set with two main variables: `lockdown` is an indicator variable that equals `1` if a municipality was in quarantine an specific month. `lockdown_days` is a numeric variable counting the number of days a municipality was in quarantine on a given month. These two variables were aggregated at the regional level so that `lockdown_per` and `lockdown_days_perc` represent the percentage of the region that was under lockdown, and the percentage of the days of the month that the region was under lockdown.
+
+The following script creates two objects containing lockdown and population data at the regional level.
+
+```{r Lockdowns, echo=FALSE}
+library(chilemapas)
+source("02_Scripts/022_LockdownDataConstruction.R")
+
+str(pop_comunas)
+str(lockdowns)
+
+#Merging employment and Lockdown data
+emp_data<-merge(emp_data,lockdowns2,by=c("ano_trimestre","mes_central","codigo_region"),all.x = T)
+
+#Merging employment and population data
+pop_region<-pop_comunas[,.(pop=sum(poblacion),PET=sum(PET),Personas_Urbanas=sum(`Total de Personas`,na.rm = T),Viviendas_Urbanas=sum(`Total de Viviendas`,na.rm = T),percent_urban_WA=weighted.mean(comuna_urbana,weight_pop)),by=.(codigo_region)]
+
+emp_data<-merge(emp_data,pop_region,by="codigo_region",all.x = T)
+
+```
+
+#### 2.3 Mobility data
+
+Mobility data comes from the official repository of the Chilean Ministry of Science. The raw data can be downloaded from [here](https://github.com/MinCiencia/Datos-COVID19/tree/master/output/producto33). This data set was created by Bravo & Ferres (2020) using mobile phone usage data and registering the moves as the phones connect to cellular communication towers. The data provides a mobility index at the municipal level, taking as the baseline mobility activity during the first week of march (before the country went into emergency mode) and comparing it subsequent weeks until September. The script bellow takes the mobility index present in the data, to calculate the percentage of mobility reduction to the baseline week at the municipality level. This variable is later aggregated to the regional level taking the simple mean of the municipalities that belongs to each region. The resulting variable `mov_reduc` is the average percentage of mobility reduction in a region in a given month.
+
+The following script creates the `mov` object containing the aforementioned mobility data.
+
+```{r Mobility, echo=FALSE}
+
+source("02_Scripts/023_MobilityDataConstruction.R")
+
+str(mov)
+
+#Merging employment and mobility data
+emp_data<-merge(emp_data,mov,by=c("codigo_region","ano_trimestre","mes_central"),all.x = T)
+
+```
+
+#### 2.4 LPE data
+
+LPE (Employment Protection Law - in Spanish) data set was constructed from raw `pdf` official files that are publicly made available by the Chilean Labor Ministry and can be downloaded from [here](https://www.dt.gob.cl/portal/1626/w3-article-118613.html). The data comes at the firm level, providing at each date it was released, the total number of workers that were placed in suspension or reduction of their labor workday. First this data was transformed into `csv` files using `OCR` recognition made available in the `tabulizer R package`. Then this data was cleaned, merged and organized into a single data set. Finally, this data was combined with the official data from the Chilean Tax office (SII in spanish) which allowed to recover firm's characteristics such as location, number of formal workers, industrial sector, among others. Given the size and length of this cleaning process, we have not included those scripts here. However they are available upon request.
+
+The following scrip loads the LPE data, still at the firm level, and aggregates the data by region and date in order to combine it with the rest of the data.
+
+```{r LPE, echo=FALSE}
+
+source("02_Scripts/024_LPEDataConstruction.R")
+
+#Merging employment and mobility data
+emp_data<-merge(emp_data,LPE2,by=c("codigo_region","ano_trimestre","mes_central"),all.x = T)
+
+str(LPE2)
+str(emp_data)
+
+fwrite(emp_data,file = "01_Data/paper_data.csv")
+foreign::write.dta(emp_data,file = "01_Data/paper_data.dta")
+```
+
+#### 2.5 Modeling
+
+This stage provides all the codes to replicate the main regressions presented in Table 2 of the paper. It also shows all the steps in the robustness checks and tests for spatial autocorrelation. Finally, all the codes used to create descriptive statistics and figures of the paper can be replicated by running the script `Descriptive_Stats_Graphs.R`
+
+```{r Modeling, echo=FALSE}
+
+source("02_Scripts/025_Modeling.R")
+```

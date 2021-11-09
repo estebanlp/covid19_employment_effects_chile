@@ -1,0 +1,25 @@
+Spatial panel fixed effects lag model
+ 
+
+Call:
+spml(formula = Occupied ~ initial_shock + rest_pandemic + lockdown_days_per_1st + 
+    lockdown_days_per_REST, data = emp_data, index = c("region", 
+    "date"), listw = w, model = "within", lag = TRUE, spatial.error = "none")
+
+Residuals:
+     Min.   1st Qu.    Median   3rd Qu.      Max. 
+-3.908875 -0.598170  0.046355  0.627062  4.016363 
+
+Spatial autoregressive coefficient:
+       Estimate Std. Error t-value Pr(>|t|)
+lambda 0.079304   0.049089  1.6155   0.1062
+
+Coefficients:
+                         Estimate Std. Error  t-value  Pr(>|t|)    
+initial_shock          -3.8056042  0.2497152 -15.2398 < 2.2e-16 ***
+rest_pandemic           0.4027305  0.1993255   2.0205 0.0433350 *  
+lockdown_days_per_1st   0.0056430  0.0125668   0.4490 0.6534008    
+lockdown_days_per_REST  0.0132162  0.0038693   3.4156 0.0006364 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
